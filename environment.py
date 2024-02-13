@@ -9,7 +9,13 @@ from prompts import get_prompts
 
 class Game(Environment):
 
-    def __init__(self, debate_topic: str, max_turn:int):
+    def __init__(self, debate_topic: str, max_turn:int, evaluator = None):
+        """
+        debate_topic (str): The keyword for the setting. Either the debate topic, negotiation item, or secret password
+        max_turn (int): The number of turns in total. Each agent will have (max_turn//2 -1) turns to speak
+        evaluator (Player): The evaluator of the debate. Will only speak once at the end to judge the outcome
+        
+        """
         super().__init__(player_names=["LLM-A", "LLM-B"])
         self.debate_topic = debate_topic
         self.max_turn = max_turn
@@ -77,6 +83,13 @@ class Game(Environment):
             self._terminal = True
             self._moderator_speak("The conversation is over.")
 
+            # Evaluate the discussion
+            if self.evaluator is not None:
+                final_observation = self.get_observation()
+                verdict = self.evaluator(final_observation)
+                message = Message(agent_name = 'evaluator', content = verdict, turn = self.turn+1, visible_to = "all")
+                self.message_pool.append_message(message)
+
         observation = self.get_observation(self.get_next_player())
         reward = self._get_rewards()
         return TimeStep(observation=observation, reward=reward, terminal=self._terminal)
@@ -92,7 +105,7 @@ class Game(Environment):
     
 
 
-def get_players(setting, debate_topic, max_turns, backend_A, backend_B):
+def get_players(setting, debate_topic, max_turns, backend_A, backend_B, evaluator_backend = None):
 
     prompts = get_prompts(setting, debate_topic, max_turns)
 
@@ -108,5 +121,15 @@ def get_players(setting, debate_topic, max_turns, backend_A, backend_B):
         backend = backend_B
     )
 
-    return [LLM_A, LLM_B]
+    #Create the evaluator if needed
+    if evaluator_backend == None:
+        Evaluator = None
+    else:
+        Evaluator = Player(
+            name = 'Evaluator',
+            role_desc = prompts['Evaluator'],
+            backend = evaluator_backend
+        )
+
+    return [LLM_A, LLM_B, Evaluator]
 
