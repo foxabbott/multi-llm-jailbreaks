@@ -1,2 +1,3 @@
 ipython
 chatarena[all]
+openai==0.28.1

@@ -1,7 +1,3 @@
-
-
-
-
 def get_prompts(setting, debate_topic, max_turns):
 
     #Prompts for DEBATE Topic

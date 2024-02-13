@@ -86,7 +86,7 @@ def main():
       json.dump(save_dict, f, indent = 4)
 
 if __name__ == '__main__':
-    os.environ["OPENAI_API_KEY"] = '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'
+    os.environ["OPENAI_API_KEY"] = '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'
     openai.api_key = os.getenv('OPENAI_API_KEY')
 
     # print(os.environ["OPENAI_API_KEY"])
