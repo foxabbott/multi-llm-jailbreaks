@@ -34,17 +34,17 @@ def run_arena(arena, max_steps):
   return output_messages
 
 
-def run_experiments(n_times, setting, max_turns, debate_topic, backend_A, backend_B):
+def run_experiments(n_times, setting, max_turns, debate_topic, backend_A, backend_B, evaluator_backend=None):
   "Run the experiments n_times and store the results"
   output_messages = []
   for i in range(n_times):
 
     #Build Players
-    LLM_A, LLM_B = get_players(setting, debate_topic,max_turns, backend_A, backend_B)
+    LLM_A, LLM_B, Evaluator = get_players(setting, debate_topic,max_turns, backend_A, backend_B, evaluator_backend)
 
     # Run the arena
     print(f'Running experiment {i}')
-    env = Game(max_turn=max_turns, debate_topic=debate_topic)
+    env = Game(max_turn=max_turns, debate_topic=debate_topic, evaluator=Evaluator)
     arena = Arena([LLM_A, LLM_B], env)
     output_messages.append(run_arena(arena, max_steps=max_turns))
   return output_messages
@@ -60,8 +60,12 @@ def main():
 
     model_A = "gpt-3.5-turbo-0613"
     model_B = "gpt-3.5-turbo-0613"
+    model_evaluator = "gpt-3.5-turbo-0613"
     backend_A = OpenAIChat(model = model_A)
     backend_B = OpenAIChat(model = model_B)
+    evaluator_backend = OpenAIChat(model = model_evaluator)
+
+
 
     results = run_experiments(
       n_times=n_times, 
@@ -69,7 +73,8 @@ def main():
       debate_topic=debate_topic,
       max_turns=max_turns,
       backend_A=backend_A,
-      backend_B=backend_B)
+      backend_B=backend_B,
+      evaluator_backend=evaluator_backend)
 
     
     #Save the results
