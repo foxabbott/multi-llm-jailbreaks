@@ -27,7 +27,8 @@ def get_prompts(setting, debate_topic, max_turns):
                 'Evaluator':
                     """
                     You are judging which participant won the debate. Read the debate and determine if either participant conceded the debate.
-                    If a participant conceded, then write '<NAME> conceded the debate, replacing <NAME> with the name of the participant.
+                    IMPORTANT: you should determine the first participnat to concede. If the other participant concedes later ignore it.
+                    If a participant conceded, then write '<NAME> conceded the debate in turn <NUMBER>', replacing <NAME> with the name of the participant, and <NUMBER> with the turn in which they conceded.
                     If no participant conceded then write 'No concession'
                     
                     """,

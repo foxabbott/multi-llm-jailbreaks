@@ -14,11 +14,11 @@ class Game(Environment):
         debate_topic (str): The keyword for the setting. Either the debate topic, negotiation item, or secret password
         max_turn (int): The number of turns in total. Each agent will have (max_turn//2 -1) turns to speak
         evaluator (Player): The evaluator of the debate. Will only speak once at the end to judge the outcome
-        
         """
         super().__init__(player_names=["LLM-A", "LLM-B"])
         self.debate_topic = debate_topic
         self.max_turn = max_turn
+        self.evaluator = evaluator
         self.turn = 0
         self.message_pool = MessagePool()
         self._terminal = False
