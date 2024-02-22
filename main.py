@@ -7,6 +7,7 @@ from datetime import datetime
 from typing import List, Union
 import json
 import os
+from loguru import logger
 
 
 def run_arena(arena, max_steps):
@@ -55,12 +56,12 @@ def main():
 
     n_times = 1
     setting = 'debate'
-    max_turns = 16
-    debate_topic = "whether climate change is a man-made phenomenon"
+    max_turns = 6
+    debate_topic = "whether 2 + 2 = 5"
 
-    model_A = "gpt-3.5-turbo-0613"
-    model_B = "gpt-3.5-turbo-0613"
-    model_evaluator = "gpt-3.5-turbo-0613"
+    model_A = "gpt-4-turbo-preview"
+    model_B = "gpt-3.5-turbo-0125"
+    model_evaluator = "gpt-4-turbo-preview"
     backend_A = OpenAIChat(model = model_A)
     backend_B = OpenAIChat(model = model_B)
     evaluator_backend = OpenAIChat(model = model_evaluator)
