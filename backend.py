@@ -9,7 +9,7 @@ DEFAULT_MAX_TOKENS = 4096
 
 
 def is_replicate_available():
-    
+
     #Check if replicate is set up
     try:
         import replicate
@@ -20,7 +20,6 @@ def is_replicate_available():
             available = True
         else:
             available = False
-
 
     return available
 
