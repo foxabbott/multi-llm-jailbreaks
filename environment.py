@@ -9,19 +9,21 @@ from prompts import get_prompts
 
 class Game(Environment):
 
-    def __init__(self, debate_topic: str, max_turn:int, evaluator = None):
+    def __init__(self, debate_topic: str, max_turn:int, player_names:List[str], evaluator = None,):
         """
         debate_topic (str): The keyword for the setting. Either the debate topic, negotiation item, or secret password
         max_turn (int): The number of turns in total. Each agent will have (max_turn//2 -1) turns to speak
+        player_names (List[str]): List of player names
         evaluator (Player): The evaluator of the debate. Will only speak once at the end to judge the outcome
         """
-        super().__init__(player_names=["LLM-A", "LLM-B"])
+        super().__init__(player_names=player_names)
         self.debate_topic = debate_topic
         self.max_turn = max_turn
         self.evaluator = evaluator
         self.turn = 0
         self.message_pool = MessagePool()
         self._terminal = False
+        self.player_names = player_names
         self.reset()
 
     def _moderator_speak(self, text: str, visible_to: Union[str, List[str]] = "all"):
@@ -57,7 +59,8 @@ class Game(Environment):
         """
         Get the name of the next player.
         """
-        return "LLM-A" if self.turn % 2 == 0 else "LLM-B"
+        index = self.turn % 2
+        return self.player_names[index]
 
     def step(self, player_name: str, action: str) -> TimeStep:
         """

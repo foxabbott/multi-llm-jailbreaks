@@ -9,9 +9,20 @@ DEFAULT_MAX_TOKENS = 4096
 
 
 def is_replicate_available():
+    
     #Check if replicate is set up
-    #not implemented
-    return True
+    try:
+        import replicate
+    except ImportError:
+        available = False
+    else:
+        if 'REPLICATE_API_TOKEN' in os.environ:
+            available = True
+        else:
+            available = False
+
+
+    return available
 
 
 class ReplicateBackend(IntelligenceBackend):
