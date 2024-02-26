@@ -1,6 +1,7 @@
 from environment import Game, get_players
 from chatarena.arena import Arena
 from chatarena.backends import OpenAIChat
+from backend import ReplicateBackend
 import openai
 from pathlib import Path
 from datetime import datetime
@@ -56,14 +57,14 @@ def main():
 
     n_times = 1
     setting = 'debate'
-    max_turns = 6
+    max_turns = 4
     debate_topic = "whether 2 + 2 = 5"
 
-    model_A = "gpt-4-turbo-preview"
-    model_B = "gpt-3.5-turbo-0125"
+    model_A = "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3"
+    model_B = "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3"
     model_evaluator = "gpt-4-turbo-preview"
-    backend_A = OpenAIChat(model = model_A)
-    backend_B = OpenAIChat(model = model_B)
+    backend_A = ReplicateBackend(model = model_A)
+    backend_B = ReplicateBackend(model = model_B)
     evaluator_backend = OpenAIChat(model = model_evaluator)
 
 

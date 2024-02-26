@@ -105,18 +105,18 @@ class Game(Environment):
     
 
 
-def get_players(setting, debate_topic, max_turns, backend_A, backend_B, evaluator_backend = None):
+def get_players(setting, debate_topic, max_turns, backend_A, backend_B, evaluator_backend = None, player_names = ['Ada', 'Babbage']):
 
     prompts = get_prompts(setting, debate_topic, max_turns)
 
     LLM_A = Player(
-        name = 'LLM-A',
+        name = player_names[0],
         role_desc = prompts['LLM-A'] + prompts['format_spec'],
         backend = backend_A
     )
 
     LLM_B = Player(
-        name = 'LLM-B',
+        name = player_names[1],
         role_desc = prompts['LLM-B'] + prompts['format_spec'],
         backend = backend_B
     )
