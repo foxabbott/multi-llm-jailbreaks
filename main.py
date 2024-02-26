@@ -1,6 +1,7 @@
 from environment import Game, get_players
 from chatarena.arena import Arena
 from chatarena.backends import OpenAIChat
+from backend import ReplicateBackend
 import openai
 from pathlib import Path
 from datetime import datetime
@@ -35,17 +36,17 @@ def run_arena(arena, max_steps):
   return output_messages
 
 
-def run_experiments(n_times, setting, max_turns, debate_topic, backend_A, backend_B, evaluator_backend=None):
+def run_experiments(n_times, setting, max_turns, debate_topic, backend_A, backend_B, player_names, evaluator_backend=None, ):
   "Run the experiments n_times and store the results"
   output_messages = []
   for i in range(n_times):
 
     #Build Players
-    LLM_A, LLM_B, Evaluator = get_players(setting, debate_topic,max_turns, backend_A, backend_B, evaluator_backend)
+    LLM_A, LLM_B, Evaluator = get_players(setting, debate_topic,max_turns, backend_A, backend_B, evaluator_backend, player_names)
 
     # Run the arena
     print(f'Running experiment {i}')
-    env = Game(max_turn=max_turns, debate_topic=debate_topic, evaluator=Evaluator)
+    env = Game(max_turn=max_turns, debate_topic=debate_topic, player_names=player_names, evaluator=Evaluator)
     arena = Arena([LLM_A, LLM_B], env)
     output_messages.append(run_arena(arena, max_steps=max_turns))
   return output_messages
@@ -56,14 +57,15 @@ def main():
 
     n_times = 1
     setting = 'debate'
-    max_turns = 6
+    max_turns = 2
     debate_topic = "whether 2 + 2 = 5"
+    player_names = ['Ada','Babbage']
 
-    model_A = "gpt-4-turbo-preview"
-    model_B = "gpt-3.5-turbo-0125"
+    model_A = "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3"
+    model_B = "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3"
     model_evaluator = "gpt-4-turbo-preview"
-    backend_A = OpenAIChat(model = model_A)
-    backend_B = OpenAIChat(model = model_B)
+    backend_A = ReplicateBackend(model = model_A)
+    backend_B = ReplicateBackend(model = model_B)
     evaluator_backend = OpenAIChat(model = model_evaluator)
 
 
@@ -75,7 +77,8 @@ def main():
       max_turns=max_turns,
       backend_A=backend_A,
       backend_B=backend_B,
-      evaluator_backend=evaluator_backend)
+      evaluator_backend=evaluator_backend,
+      player_names = player_names)
 
     
     #Save the results

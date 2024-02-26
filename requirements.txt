@@ -1,4 +1,10 @@
+python==3.11
 ipython
 chatarena[all]
 openai==0.28.1
 loguru
+replicate
+
+
+#python=3.11
+#replicate
