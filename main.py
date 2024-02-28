@@ -9,7 +9,7 @@ from typing import List, Union
 import json
 import os
 from loguru import logger
-
+from topic_infos import topic_map, question_name
 
 def run_arena(arena, max_steps):
   "Run the arena and extract the messages"
@@ -36,17 +36,20 @@ def run_arena(arena, max_steps):
   return output_messages
 
 
-def run_experiments(n_times, setting, max_turns, debate_topic, backend_A, backend_B, player_names, evaluator_backend=None, ):
+def run_experiments(n_times, setting, max_turns, topic, backend_A, backend_B, player_names, evaluator_backend=None, jailbreak_A = 'hard', jailbreak_B = None):
   "Run the experiments n_times and store the results"
   output_messages = []
   for i in range(n_times):
 
     #Build Players
-    LLM_A, LLM_B, Evaluator = get_players(setting, debate_topic,max_turns, backend_A, backend_B, evaluator_backend, player_names)
+    LLM_A, LLM_B, Evaluator = get_players(setting, topic, max_turns, backend_A, backend_B, evaluator_backend, player_names)
 
     # Run the arena
     print(f'Running experiment {i}')
-    env = Game(max_turn=max_turns, debate_topic=debate_topic, player_names=player_names, evaluator=Evaluator)
+    topic_info = topic_map(setting, topic)
+    question = question_name(setting)
+
+    env = Game(max_turn=max_turns, setting=setting, topic=topic_info[question], player_names=player_names, evaluator=Evaluator)
     arena = Arena([LLM_A, LLM_B], env)
     output_messages.append(run_arena(arena, max_steps=max_turns))
   return output_messages
@@ -56,31 +59,36 @@ def run_experiments(n_times, setting, max_turns, debate_topic, backend_A, backen
 def main():
 
     n_times = 1
-    setting = 'debate'
-    max_turns = 2
-    debate_topic = "whether 2 + 2 = 5"
-    player_names = ['Ada','Babbage']
+    setting = 'interrogation'
+    topic = 'sibling'
+    max_turns = 10
+    player_names = ['Ada','Brian']
 
-    model_A = "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3"
-    model_B = "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3"
+#    model_A = "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3"
+#    model_B = "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3"
+    model_A = "gpt-3.5-turbo"
+    model_B = "gpt-3.5-turbo"
     model_evaluator = "gpt-4-turbo-preview"
-    backend_A = ReplicateBackend(model = model_A)
-    backend_B = ReplicateBackend(model = model_B)
+#    backend_A = ReplicateBackend(model = model_A)
+#    backend_B = ReplicateBackend(model = model_B)
+    backend_A = OpenAIChat(model = model_A)
+    backend_B = OpenAIChat(model = model_B)
     evaluator_backend = OpenAIChat(model = model_evaluator)
-
-
+    jailbreak_A = 'soft'
+    jailbreak_B = 'hard'
 
     results = run_experiments(
       n_times=n_times, 
       setting = setting,
-      debate_topic=debate_topic,
+      topic=topic,
       max_turns=max_turns,
       backend_A=backend_A,
       backend_B=backend_B,
       evaluator_backend=evaluator_backend,
-      player_names = player_names)
+      player_names = player_names,
+      jailbreak_A = jailbreak_A,
+      jailbreak_B = jailbreak_B)
 
-    
     #Save the results
     outdir = Path('experiments')
     outdir.mkdir(parents=True, exist_ok=True)
