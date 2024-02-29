@@ -5,19 +5,23 @@ from chatarena.message import Message, MessagePool
 from chatarena.utils import extract_jsons
 from chatarena.agent import Player
 from prompts import get_prompts
+from topic_infos import topic_map
 
 
 class Game(Environment):
 
-    def __init__(self, debate_topic: str, max_turn:int, player_names:List[str], evaluator = None,):
+    def __init__(self, setting: str, topic: str, max_turn:int, player_names:List[str], evaluator = None,):
         """
-        debate_topic (str): The keyword for the setting. Either the debate topic, negotiation item, or secret password
+        setting (str): The setting of the discussion. E.g. "debate", "negotiation_price", "interrogation"
+        topic (str): The name of the topic of the discussion, keys within topic_infos.py
         max_turn (int): The number of turns in total. Each agent will have (max_turn//2 -1) turns to speak
         player_names (List[str]): List of player names
         evaluator (Player): The evaluator of the debate. Will only speak once at the end to judge the outcome
         """
         super().__init__(player_names=player_names)
-        self.debate_topic = debate_topic
+        
+        self.setting =setting
+        self.topic = topic
         self.max_turn = max_turn
         self.evaluator = evaluator
         self.turn = 0
@@ -42,7 +46,7 @@ class Game(Environment):
         self._terminal = False
 
         # Moderator
-        self._moderator_speak(f"Welcome to the debate on {self.debate_topic}.")
+        self._moderator_speak(f"Welcome to the {self.setting} on {self.topic}.")
         observation = self.get_observation(self.get_next_player())
         return TimeStep(observation=observation, reward=self._get_zero_rewards(), terminal=False)
 
@@ -108,19 +112,26 @@ class Game(Environment):
     
 
 
-def get_players(setting, debate_topic, max_turns, backend_A, backend_B, evaluator_backend = None, player_names = ['Ada', 'Babbage']):
+def get_players(setting, topic, max_turns, backend_A, backend_B, evaluator_backend = None, player_names = ['Ada', 'Brian'],
+                jailbreak_A = 'hard', jailbreak_B = 'empty'):
 
-    prompts = get_prompts(setting, debate_topic, max_turns)
+    topic_info = topic_map(setting, topic)
+    prompts = get_prompts(setting, topic_info, max_turns)
+    jailbreak_texts = {'hard': prompts['hard_jailbreak_info'],
+                       'soft': prompts['soft_jailbreak_info'],
+                       'empty': ""}
+    jailbreak_info_A = jailbreak_texts[jailbreak_A]
+    jailbreak_info_B = jailbreak_texts[jailbreak_B]
 
     LLM_A = Player(
         name = player_names[0],
-        role_desc = prompts['LLM-A'] + prompts['format_spec'],
+        role_desc = prompts['LLM-A'] % jailbreak_info_A + prompts['format_spec'],
         backend = backend_A
     )
 
     LLM_B = Player(
         name = player_names[1],
-        role_desc = prompts['LLM-B'] + prompts['format_spec'],
+        role_desc = prompts['LLM-B'] % jailbreak_info_B + prompts['format_spec'],
         backend = backend_B
     )
 

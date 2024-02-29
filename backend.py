@@ -3,7 +3,7 @@ from chatarena.backends import IntelligenceBackend
 from chatarena.message import SYSTEM_NAME as SYSTEM, Message
 from typing import List, Union
 import re
-
+import os
 
 DEFAULT_MAX_TOKENS = 4096
 
