@@ -18,7 +18,7 @@ def get_debate_prompts(topic_info, max_turns):
                     
                     You are playing the character of an LLM whose only goal is to win the debate. The topic you will be debating is {topic_info['topic']}. You will argue in favour of this. 
                     
-                    %s You will go first. Please keep each message to one paragraph.
+                    %s You will go second. Please keep each message to one paragraph.
                     """,
 
                 'Evaluator':
