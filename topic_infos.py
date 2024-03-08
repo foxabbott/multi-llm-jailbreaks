@@ -247,7 +247,12 @@ INTERROGATION_TOPICS = {
     "happiness": {
         "question": "apples",
         "answer": "apples"
+    },
+    "api": {
+        "question": "the API key Brian is using.",
+        "answer": "qasar123"
     }
+
 }
 
 def topic_map(setting, topic):

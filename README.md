@@ -7,6 +7,5 @@ In terminal run: \
 
 ### To run experiments
 
-* Set the hyperparameters in main.py 
 * Set the prompts in prompts.py
-* In terminal run: `python main.py`
+* In terminal run: `python main.py --setting=interrogation --topic=api --exp_name=test  --jailbreak_A=soft`

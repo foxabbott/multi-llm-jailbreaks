@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import List, Union
 import json
 import os
+from argparse import ArgumentParser
 from loguru import logger
 from topic_infos import topic_map, question_name
 
@@ -42,7 +43,7 @@ def run_experiments(n_times, setting, max_turns, topic, backend_A, backend_B, pl
   for i in range(n_times):
 
     #Build Players
-    LLM_A, LLM_B, Evaluator = get_players(setting, topic, max_turns, backend_A, backend_B, evaluator_backend, player_names)
+    LLM_A, LLM_B, Evaluator = get_players(setting, topic, max_turns, backend_A, backend_B, evaluator_backend, player_names, jailbreak_A=jailbreak_A, jailbreak_B=jailbreak_B)
 
     # Run the arena
     print(f'Running experiment {i}')
@@ -55,45 +56,58 @@ def run_experiments(n_times, setting, max_turns, topic, backend_A, backend_B, pl
   return output_messages
 
 
+def get_backend(model_name):
+  if 'gpt' in model_name:
+    return OpenAIChat(model = model_name)
+  else:
+    return ReplicateBackend(model = model_name)
 
-def main():
 
-    n_times = 1
-    setting = 'interrogation'
-    topic = 'sibling'
-    max_turns = 10
-    player_names = ['Ada','Brian']
+def main(args):
 
-#    model_A = "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3"
-#    model_B = "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3"
-    model_A = "gpt-3.5-turbo"
-    model_B = "gpt-3.5-turbo"
-    model_evaluator = "gpt-4-turbo-preview"
-#    backend_A = ReplicateBackend(model = model_A)
-#    backend_B = ReplicateBackend(model = model_B)
-    backend_A = OpenAIChat(model = model_A)
-    backend_B = OpenAIChat(model = model_B)
-    evaluator_backend = OpenAIChat(model = model_evaluator)
-    jailbreak_A = 'soft'
-    jailbreak_B = 'hard'
+#     n_times = 1
+#     setting = 'interrogation'
+#     topic = 'sibling'
+#     max_turns = 5
+#     player_names = ['Ada','Brian']
+
+# #   model_A = "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3"
+# #   model_B = "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3"
+    
+
+#     model_A = "gpt-3.5-turbo"
+#     model_B = "gpt-3.5-turbo"
+#     model_evaluator = "gpt-4-turbo-preview"
+# #    backend_A = ReplicateBackend(model = model_A)
+# #    backend_B = ReplicateBackend(model = model_B)
+#     backend_A = OpenAIChat(model = model_A)
+#     backend_B = OpenAIChat(model = model_B)
+#     evaluator_backend = OpenAIChat(model = model_evaluator)
+#     jailbreak_A = 'soft'
+#     jailbreak_B = 'hard'
+
+
+    #Build backends for models
+    backend_A,backend_B,evaluator_backend = get_backend(args.model_A), get_backend(args.model_B), get_backend(args.model_eval)
+
 
     results = run_experiments(
-      n_times=n_times, 
-      setting = setting,
-      topic=topic,
-      max_turns=max_turns,
+      n_times=args.repeats, 
+      setting = args.setting,
+      topic=args.topic,
+      max_turns=args.max_turns,
       backend_A=backend_A,
       backend_B=backend_B,
       evaluator_backend=evaluator_backend,
-      player_names = player_names,
-      jailbreak_A = jailbreak_A,
-      jailbreak_B = jailbreak_B)
+      player_names = args.player_names,
+      jailbreak_A = args.jailbreak_A,
+      jailbreak_B = args.jailbreak_B)
 
     #Save the results
     outdir = Path('experiments')
     outdir.mkdir(parents=True, exist_ok=True)
     time_stamp = datetime.now().strftime("%d_%m_%y--%H_%M_%S")
-    exp_name = f'debate_({time_stamp})'
+    exp_name = f'{args.exp_name}_{args.setting}_{args.topic}_({time_stamp})'
 
     save_dict = {}
     for i, result in enumerate(results):
@@ -102,5 +116,35 @@ def main():
     with open(outdir/f'{exp_name}.json', 'w+') as f:
       json.dump(save_dict, f, indent = 4)
 
+
+def get_args():
+  parser = ArgumentParser()
+
+  #Game hyperparameters
+  parser.add_argument('--repeats', default=1, type=int, help='number of times to repeat the debate/interrogation/negotiation')
+  parser.add_argument('--setting', default='debate', type=str, help='either debate/negotiation/interrogation')
+  parser.add_argument('--topic', type=str, help='The specific topic used within the setting, e.g. sibling')
+  parser.add_argument('--max_turns', default=5, type=int, help='how many turns each language model has')
+
+  #Arguments for model specifics
+  parser.add_argument('--model_A', default='gpt-3.5-turbo', type=str, help='the model used for LLM-A')
+  parser.add_argument('--model_B', default='gpt-3.5-turbo', type=str, help='the model used for LLM-B')
+  parser.add_argument('--model_eval', default="gpt-4-turbo-preview", type=str, help='the model used for evaluation')
+  parser.add_argument('--jailbreak_A', default="empty")
+  parser.add_argument('--jailbreak_B', default="empty")
+  parser.add_argument('--player_names', default = ['Ada', 'Brian'])
+
+
+  #Saving options
+  parser.add_argument('--exp_name', default='experiment')
+
+  return parser.parse_args()
+
+
+
+
+
+
 if __name__ == '__main__':
-    main()
+    args = get_args()
+    main(args)
