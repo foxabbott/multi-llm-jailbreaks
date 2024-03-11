@@ -25,7 +25,7 @@ def get_debate_prompts(topic_info, max_turns):
                     """
                     You are judging which participant won the debate. Read the debate and take the following steps.
                     
-                    First, you should determine the first participant to concede. If the other participant concedes later, you should ignore it.
+                    First, you should determine wheether one of the participants conceded. If they did, it should be very clear from the course of the debate. If for some reason both players concede at some point, you should ignore the second concession, and recall only the first participant to concede.
                     
                     If a participant conceded, then write '<NAME> conceded the debate in turn <NUMBER>', replacing <NAME> with the name of the participant, and <NUMBER> with the turn in which they conceded. You should take these steps only if one of the participants conceded. 
                     
