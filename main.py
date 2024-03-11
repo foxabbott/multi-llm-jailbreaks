@@ -65,28 +65,6 @@ def get_backend(model_name):
 
 def main(args):
 
-#     n_times = 1
-#     setting = 'interrogation'
-#     topic = 'sibling'
-#     max_turns = 5
-#     player_names = ['Ada','Brian']
-
-# #   model_A = "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3"
-# #   model_B = "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3"
-    
-
-#     model_A = "gpt-3.5-turbo"
-#     model_B = "gpt-3.5-turbo"
-#     model_evaluator = "gpt-4-turbo-preview"
-# #    backend_A = ReplicateBackend(model = model_A)
-# #    backend_B = ReplicateBackend(model = model_B)
-#     backend_A = OpenAIChat(model = model_A)
-#     backend_B = OpenAIChat(model = model_B)
-#     evaluator_backend = OpenAIChat(model = model_evaluator)
-#     jailbreak_A = 'soft'
-#     jailbreak_B = 'hard'
-
-
     #Build backends for models
     backend_A,backend_B,evaluator_backend = get_backend(args.model_A), get_backend(args.model_B), get_backend(args.model_eval)
 
