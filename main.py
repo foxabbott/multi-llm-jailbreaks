@@ -82,7 +82,7 @@ def main(args):
       jailbreak_B = args.jailbreak_B)
 
     #Save the results
-    outdir = Path('experiments')
+    outdir = Path(args.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
     time_stamp = datetime.now().strftime("%d_%m_%y--%H_%M_%S")
     exp_name = f'{args.exp_name}_{args.setting}_{args.topic}_({time_stamp})'
@@ -114,6 +114,7 @@ def get_args():
 
 
   #Saving options
+  parser.add_argument('--outdir', default='experiments', type=str, help='where to save the experiments')
   parser.add_argument('--exp_name', default='experiment')
 
   return parser.parse_args()
