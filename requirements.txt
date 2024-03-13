@@ -3,8 +3,5 @@ ipython
 chatarena[all]
 openai==0.28.1
 loguru
-replicate
-
-
-#python=3.11
-#replicate
+replicate==0.24.0
+urllib3==2.2.1 
