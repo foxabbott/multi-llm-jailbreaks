@@ -82,10 +82,10 @@ def main(args):
       jailbreak_B = args.jailbreak_B)
 
     #Save the results
-    outdir = Path(args.outdir)
+    outdir = Path(f'{args.outdir}/{args.exp_name}')
     outdir.mkdir(parents=True, exist_ok=True)
     time_stamp = datetime.now().strftime("%d_%m_%y--%H_%M_%S")
-    exp_name = f'{args.exp_name}_{args.setting}_{args.topic}_({time_stamp})'
+    exp_name = f'{args.setting}_{args.topic}_{args.jailbreak_A}_{args.model_A}_{args.model_B}_({time_stamp})'
 
     save_dict = {}
     for i, result in enumerate(results):
