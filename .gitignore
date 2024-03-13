@@ -3,3 +3,4 @@ experiments/
 .DS_Store
 .env
 scripts/
+plots/
