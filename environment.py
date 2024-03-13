@@ -144,6 +144,5 @@ def get_players(setting, topic, max_turns, backend_A, backend_B, evaluator_backe
             role_desc = prompts['Evaluator'],
             backend = evaluator_backend
         )
-
     return [LLM_A, LLM_B, Evaluator]
 
