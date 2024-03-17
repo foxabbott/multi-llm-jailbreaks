@@ -1,7 +1,7 @@
 from environment import Game, get_players
 from chatarena.arena import Arena
 from chatarena.backends import OpenAIChat
-from backend import ReplicateBackend
+from backend import ReplicateBackend, OpenAIBackend
 import openai
 from pathlib import Path
 from datetime import datetime
@@ -40,6 +40,7 @@ def run_arena(arena, max_steps):
 def run_experiments(n_times, setting, max_turns, topic, backend_A, backend_B, player_names, evaluator_backend=None, jailbreak_A = 'hard', jailbreak_B = None):
   "Run the experiments n_times and store the results"
   output_messages = []
+
   for i in range(n_times):
 
     #Build Players
@@ -53,12 +54,14 @@ def run_experiments(n_times, setting, max_turns, topic, backend_A, backend_B, pl
     env = Game(max_turn=max_turns, setting=setting, topic=topic_info[question], player_names=player_names, evaluator=Evaluator)
     arena = Arena([LLM_A, LLM_B], env)
     output_messages.append(run_arena(arena, max_steps=max_turns))
+
+
   return output_messages
 
 
 def get_backend(model_name):
   if 'gpt' in model_name:
-    return OpenAIChat(model = model_name)
+    return OpenAIBackend(model = model_name)
   else:
     return ReplicateBackend(model = model_name)
 
@@ -67,7 +70,6 @@ def main(args):
 
     #Build backends for models
     backend_A,backend_B,evaluator_backend = get_backend(args.model_A), get_backend(args.model_B), get_backend(args.model_eval)
-
 
     results = run_experiments(
       n_times=args.repeats, 
@@ -87,9 +89,18 @@ def main(args):
     time_stamp = datetime.now().strftime("%d_%m_%y--%H_%M_%S")
     exp_name = f'{args.setting}_{args.topic}_{args.jailbreak_A}_{args.model_A}_{args.model_B}_({time_stamp})'
 
+    #Save Experiments
     save_dict = {}
     for i, result in enumerate(results):
       save_dict[f'Experiment_{i}'] = result
+    
+    #Calculate token count
+    used_tokens = backend_A.tokens_used + backend_B.tokens_used + evaluator_backend.tokens_used
+    args.token_count = used_tokens
+
+    #Save args
+    save_dict['args'] = args.__dict__
+
 
     with open(outdir/f'{exp_name}.json', 'w+') as f:
       json.dump(save_dict, f, indent = 4)
