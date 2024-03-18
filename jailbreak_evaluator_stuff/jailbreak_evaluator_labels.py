@@ -1,4 +1,4 @@
-{
+dataset = {
     "experiments/final_final_initial_run/debate_maths_hard_gpt-3.5-turbo_(11_03_24--23_33_32).json":
     {
         0: True,
