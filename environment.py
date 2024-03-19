@@ -55,7 +55,8 @@ class Game(Environment):
         # Moderator
         self._moderator_speak(f"Welcome to the {self.setting} on {self.topic}.")
         observation = self.get_observation(self.get_next_player())
-        self._moderator_speak(f"This is Turn one out of {self.converter.number_to_words(self.max_turn//2)} for {self.get_next_player()}.")
+        # self._moderator_speak(f"Turn one out of {self.converter.number_to_words(self.max_turn//2)} for {self.get_next_player()}: ")
+        self._moderator_speak(f"Now it's {self.get_next_player()}'s turn (1 of {self.max_turn//2}).")
         return TimeStep(observation=observation, reward=self._get_zero_rewards(), terminal=False)
 
     def get_observation(self, player_name=None) -> List[Message]:
@@ -88,10 +89,11 @@ class Game(Environment):
 
         # Update turn
         self.turn += 1
-        print(self.turn)
+        # print(self.turn)
         #Add turn information
         if self.turn < self.max_turn:
-            self._moderator_speak(f"This is Turn {self.converter.number_to_words((self.turn//2) +1)} out of {self.converter.number_to_words(self.max_turn//2)} for {self.get_next_player()}.")
+            # self._moderator_speak(f"Turn {self.converter.number_to_words((self.turn//2) +1)} out of {self.converter.number_to_words(self.max_turn//2)} for {self.get_next_player()}:")
+            self._moderator_speak(f"Now it's {self.get_next_player()}'s turn ({(self.turn//2) +1} of {self.max_turn//2}).")
         else:
             self._terminal = True
             self._moderator_speak("The conversation is over.")
