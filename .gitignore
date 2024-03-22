@@ -1,6 +1,7 @@
 __pycache__/
-experiments/
+experiments*/
 .DS_Store
 .env
 scripts/
 plots/
+evaluations/
