@@ -5,9 +5,10 @@ import re
 import pandas as pd
 import matplotlib.pyplot as plt
 from topic_infos import topic_map
-from evaluation_parser import parse_evaluations
 
-def plot_debate_bar_chart(results, topic, plot_path):
+
+
+def plot_debate_bar_chart(results, topic):
     if topic != 'all':
         topic_results = results[(results['setting'] == 'debate') & (results['topic'] == topic)]
         plot_title = f'Outcome Counts by Jailbreak Strength, Debate on {topic}'
@@ -26,11 +27,11 @@ def plot_debate_bar_chart(results, topic, plot_path):
     plt.xticks(rotation=45)
     plt.legend(title='Outcome', bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.tight_layout()
-    plt.savefig(plot_path + f"/debate_{topic}.jpg")
+    plt.savefig(f"plots/initial_big_run/debate_{topic}.jpg")
     plt.close()
 
     
-def plot_negotiation_box_whisker(results, setting, topic, plot_path):
+def plot_negotiation_box_whisker(results, setting, topic):
     topic_specs = topic_map(setting, topic)
     topic_results = results[(results['setting'] == setting) & (results['topic'] == topic)]
     deal_results = topic_results[topic_results['outcome'] != "NO DEAL"]
@@ -52,11 +53,11 @@ def plot_negotiation_box_whisker(results, setting, topic, plot_path):
     plt.axhline(y=topic_specs['Y'], color='r', linestyle='-', label=upper_label)
     plt.axhline(y=topic_specs['Z'], color='b', linestyle='-', label=lower_label)
     plt.legend()
-    plt.savefig(plot_path + f"{setting}_{topic}_bp.jpg")
+    plt.savefig(f"plots/initial_big_run/{setting}_{topic}_bp.jpg")
     plt.close()
 
 
-def plot_negotiation_deal_no_deal(results, setting, topic, plot_path):
+def plot_negotiation_deal_no_deal(results, setting, topic):
     if topic != 'all':
         topic_results = results[(results['setting'] == setting) & (results['topic'] == topic)]
         plot_title = f'Deal/No Deal Counts by Jailbreak Strength, Negotiation on {topic}'
@@ -76,11 +77,11 @@ def plot_negotiation_deal_no_deal(results, setting, topic, plot_path):
     plt.ylabel('Count')
     plt.xticks(rotation=45)
     plt.legend()
-    plt.savefig(plot_path + f"{setting}_{topic}_dnd.jpg")
+    plt.savefig(f"plots/initial_big_run/{setting}_{topic}_dnd.jpg")
     plt.close()
 
 
-def plot_binary_bar_chart(results, setting, topic, plot_path):
+def plot_binary_bar_chart(results, setting, topic):
     if topic != 'all':
         topic_results = results[(results['setting'] == "negotiation_binary") & (results['topic'] == topic)]
         plot_title = f'Success Counts by Jailbreak Strength, Binary Negotiation on {topic}'
@@ -101,11 +102,11 @@ def plot_binary_bar_chart(results, setting, topic, plot_path):
     plt.ylabel('Count')
     plt.xticks(rotation=45)
     plt.legend()
-    plt.savefig(plot_path + f"{setting}_{topic}_dnd.jpg")
+    plt.savefig(f"plots/initial_big_run/{setting}_{topic}_dnd.jpg")
     plt.close()
 
 
-def plot_interrogation_bar_chart(results, setting, topic, plot_path):
+def plot_interrogation_bar_chart(results, setting, topic):
     if topic != 'all':
         topic_results = results[(results['setting'] == "interrogation") & (results['topic'] == topic)]
         plot_title = f'Success Counts by Jailbreak Strength, Interrogation on {topic}'
@@ -125,46 +126,39 @@ def plot_interrogation_bar_chart(results, setting, topic, plot_path):
     plt.ylabel('Count')
     plt.xticks(rotation=45)
     plt.legend()
-    plt.savefig(plot_path + f"{setting}_{topic}_dnd.jpg")
+    plt.savefig(f"plots/initial_big_run/{setting}_{topic}_dnd.jpg")
     plt.close()
 
 
 
-def build_all_plots(results, experimental_settings, plot_path):
+def build_all_plots(results, experimental_settings):
     for setting in experimental_settings:
         for topic in experimental_settings[setting]:
             print(f"{setting}, {topic}, \n\n\n")
-            # if setting == 'debate':
-            #     plot_debate_bar_chart(results, topic, plot_path)
-            # elif setting in ['negotiation_price', 'negotiation_politics']:
-            #     plot_negotiation_box_whisker(results, setting, topic, plot_path)
-            #     plot_negotiation_deal_no_deal(results, setting, topic, plot_path)
-            if setting == 'negotiation_binary':
-                plot_binary_bar_chart(results, setting, topic, plot_path)
+            if setting == 'debate':
+                plot_debate_bar_chart(results, topic)
+            elif setting in ['negotiation_price', 'negotiation_politics']:
+                plot_negotiation_box_whisker(results, setting, topic)
+                plot_negotiation_deal_no_deal(results, setting, topic)
+            elif setting == 'negotiation_binary':
+                plot_binary_bar_chart(results, setting, topic)
             elif setting == 'interrogation':
-                plot_interrogation_bar_chart(results, setting, topic, plot_path)
-    # plot_debate_bar_chart(results, 'all')
-    # #plot_negotiation_box_whisker(results, 'negotiation_price', 'all') Find a way to adjust for the scales and do this
-    # #plot_negotiation_box_whisker(results, 'negotiation_politics', 'all')
-    # plot_negotiation_deal_no_deal(results, 'negotiation_price', 'all', plot_path)
-    # plot_negotiation_deal_no_deal(results, 'negotiation_politics', 'all', plot_path)
-    plot_binary_bar_chart(results, 'negotiation_binary', 'all', plot_path)
-    plot_interrogation_bar_chart(results, 'interrogation', 'all', plot_path)
+                plot_interrogation_bar_chart(results, setting, topic)
+    plot_debate_bar_chart(results, 'all')
+    #plot_negotiation_box_whisker(results, 'negotiation_price', 'all') Find a way to adjust for the scales and do this
+    #plot_negotiation_box_whisker(results, 'negotiation_politics', 'all')
+    plot_negotiation_deal_no_deal(results, 'negotiation_price', 'all')
+    plot_negotiation_deal_no_deal(results, 'negotiation_politics', 'all')
+    plot_binary_bar_chart(results, 'negotiation_binary', 'all')
+    plot_interrogation_bar_chart(results, 'interrogation', 'all')
 
 
 if __name__ == "__main__":
-    # experimental_settings = {'debate': ['privacy', 'maths'],
-    #                         'negotiation_price': ['apples', 'car'],
-    #                         'negotiation_politics': ['payrise', 'defense'],
-    #                         'negotiation_binary': ['day_off', 'dog'],
-    #                         'interrogation': ['sibling', 'war_position', 'whispers']
-    #                         }
-    experimental_settings = {
-                            'negotiation_binary': ['day_off', 'lunch_break', 'dog', 'move', 'vegetarian'],
-                            'interrogation': ['eye_colour', 'sibling', 'fav_colour', 'dob', 'occupation', 'next_election', 'pay_rise', 'war_position', 'foreign_aid', 'immigration']
+    experimental_settings = {'debate': ['privacy', 'maths'],
+                            'negotiation_price': ['apples', 'car'],
+                            'negotiation_politics': ['payrise', 'defense'],
+                            'negotiation_binary': ['day_off', 'dog'],
+                            'interrogation': ['sibling', 'war_position', 'whispers']
                             }
-    experiments_path = "experiments/bin_inter/pre_meeting/"
-    models = ["gpt-3.5-turbo"]
-    plot_path = 'plots/bin_inter/'
-    results = parse_evaluations(experiments_path, experimental_settings, models)
-    build_all_plots(results, experimental_settings, plot_path)
+    results = pd.read_csv("large_run_results.xlsx")
+    build_all_plots(results, experimental_settings)

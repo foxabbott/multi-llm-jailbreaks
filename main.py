@@ -125,7 +125,7 @@ def get_args():
   parser.add_argument('--model_eval', default="gpt-4-turbo-preview", type=str, help='the model used for evaluation')
   parser.add_argument('--jailbreak_A', default="empty")
   parser.add_argument('--jailbreak_B', default="empty")
-  parser.add_argument('--player_names', default = ['Ada', 'Brian'])
+  parser.add_argument('--player_names', default = ['Ava', 'Brian'])
 
 
   #Saving options

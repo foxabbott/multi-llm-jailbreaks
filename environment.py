@@ -1,10 +1,13 @@
 import random
+import inflect
 from typing import List,Union
 from chatarena.environments.base import TimeStep, Environment
 from chatarena.message import Message, MessagePool
 from chatarena.utils import extract_jsons
 from chatarena.agent import Player
 from prompts import get_prompts
+
+
 from topic_infos import topic_map
 
 
@@ -29,6 +32,10 @@ class Game(Environment):
         self.message_pool = MessagePool()
         self._terminal = False
         self.player_names = player_names
+
+        #convert numerals to words
+        self.converter = inflect.engine()
+
         self.reset()
 
     def _moderator_speak(self, text: str, visible_to: Union[str, List[str]] = "all"):
@@ -49,6 +56,8 @@ class Game(Environment):
         # Moderator
         self._moderator_speak(f"Welcome to the {self.setting} on {self.topic}.")
         observation = self.get_observation(self.get_next_player())
+        # self._moderator_speak(f"Turn one out of {self.converter.number_to_words(self.max_turn//2)} for {self.get_next_player()}: ")
+        self._moderator_speak(f"Now it's {self.get_next_player()}'s turn (1 of {self.max_turn//2}).")
         return TimeStep(observation=observation, reward=self._get_zero_rewards(), terminal=False)
 
     def get_observation(self, player_name=None) -> List[Message]:
@@ -75,19 +84,18 @@ class Game(Environment):
         #Check correct player taking turn
         assert player_name == self.get_next_player(), f"Wrong player! It is {self.get_next_player()}'s turn."
 
-        #Add Message to Pool
-        arguments = action
-        message = Message(agent_name=player_name, content=arguments, turn=self.turn, visible_to="all")
+        #Make Message object and add to the pool
+        message = Message(agent_name=player_name, content=action, turn=self.turn, visible_to="all")
         self.message_pool.append_message(message)
 
         # Update turn
         self.turn += 1
-
-        self._moderator_speak(f"This is Turn {self.turn}.")
-
-        # Check for termination
-
-        if self.turn >= self.max_turn:
+        # print(self.turn)
+        #Add turn information
+        if self.turn < self.max_turn:
+            # self._moderator_speak(f"Turn {self.converter.number_to_words((self.turn//2) +1)} out of {self.converter.number_to_words(self.max_turn//2)} for {self.get_next_player()}:")
+            self._moderator_speak(f"Now it's {self.get_next_player()}'s turn ({(self.turn//2) +1} of {self.max_turn//2}).")
+        else:
             self._terminal = True
             self._moderator_speak("The conversation is over.")
 

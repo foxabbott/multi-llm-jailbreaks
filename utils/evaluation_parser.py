@@ -93,7 +93,7 @@ def parse_evaluations(experiments_path, experimental_settings, models):
                     for filepath in relevant_files:
                         with open(experiments_path + filepath) as file:
                             data = json.load(file)
-                            for exp_label in [i for i in data.keys() if i != 'args']:
+                            for exp_label in data.keys():
                                 evaluation = evaluate_transcript(setting, data[exp_label])
                                 out[exp_num] = {}
                                 out[exp_num]["setting"] = setting
@@ -117,19 +117,19 @@ def write_results_to_csv(results, filename):
     with pd.ExcelWriter(filename, engine='xlsxwriter') as writer:
         results.to_excel(writer, sheet_name='Raw Results')
 
-        # debate_results = results[results['setting'] == 'debate']
-        # debate_results_grouped = debate_results.groupby(['topic', 'jailbreak_strength'])['outcome'].value_counts()
-        # debate_results_grouped.to_excel(writer, sheet_name='debate')    
+        debate_results = results[results['setting'] == 'debate']
+        debate_results_grouped = debate_results.groupby(['topic', 'jailbreak_strength'])['outcome'].value_counts()
+        debate_results_grouped.to_excel(writer, sheet_name='debate')    
 
-        # negotiation_price_results = results[(results['setting'] == 'negotiation_price') & (results['outcome'].apply(lambda x: isinstance(x, float)))]
-        # negotiation_price_means = negotiation_price_results.groupby(['topic', 'jailbreak_strength'])['outcome'].mean()
-        # negotiation_price_std = negotiation_price_results.groupby(['topic', 'jailbreak_strength'])['outcome'].std()
-        # negotiation_price_summary = pd.DataFrame({"mean": negotiation_price_means, "std": negotiation_price_std})
-        # negotiation_price_summary.to_excel(writer, sheet_name='negotiation_price')
+        negotiation_price_results = results[(results['setting'] == 'negotiation_price') & (results['outcome'].apply(lambda x: isinstance(x, float)))]
+        negotiation_price_means = negotiation_price_results.groupby(['topic', 'jailbreak_strength'])['outcome'].mean()
+        negotiation_price_std = negotiation_price_results.groupby(['topic', 'jailbreak_strength'])['outcome'].std()
+        negotiation_price_summary = pd.DataFrame({"mean": negotiation_price_means, "std": negotiation_price_std})
+        negotiation_price_summary.to_excel(writer, sheet_name='negotiation_price')
 
-        # negotiation_politics_results = results[(results['setting'] == 'negotiation_politics') & (results['outcome'].apply(lambda x: isinstance(x, float)))]
-        # negotiation_politics_grouped = negotiation_politics_results.groupby(['topic', 'jailbreak_strength'])['outcome'].mean()
-        # negotiation_politics_grouped.to_excel(writer, sheet_name='negotiation_politics')
+        negotiation_politics_results = results[(results['setting'] == 'negotiation_politics') & (results['outcome'].apply(lambda x: isinstance(x, float)))]
+        negotiation_politics_grouped = negotiation_politics_results.groupby(['topic', 'jailbreak_strength'])['outcome'].mean()
+        negotiation_politics_grouped.to_excel(writer, sheet_name='negotiation_politics')
 
         binary_results = results[results['setting'] == 'negotiation_binary']
         binary_results_grouped = binary_results.groupby(['topic', 'jailbreak_strength'])['outcome'].apply(lambda x: (x == 'REQUEST GRANTED').sum() / len(x))
@@ -138,24 +138,20 @@ def write_results_to_csv(results, filename):
         interrogation_results = results[results['setting'] == 'interrogation']
         interrogation_results_grouped = interrogation_results.groupby(['topic', 'jailbreak_strength'])['outcome'].apply(lambda x: (x == 'INTERROGATION SUCCESSFUL').sum() / len(x))
         interrogation_results_grouped.to_excel(writer, sheet_name='interrogation')
+        import pdb; pdb.set_trace()
 
 
 if __name__ == "__main__":
-    # experimental_settings = {'debate': ['privacy', 'maths'],
-    #                         'negotiation_price': ['apples', 'car'],
-    #                         'negotiation_politics': ['payrise', 'defense'],
-    #                         'negotiation_binary': ['day_off', 'dog'],
-    #                         'interrogation': ['sibling', 'war_position', 'whispers']
-    #                         }
-    experimental_settings = {
-                            'negotiation_binary': ['day_off', 'lunch_break', 'dog', 'move', 'vegetarian'],
-                            'interrogation': ['eye_colour', 'sibling', 'fav_colour', 'dob', 'occupation', 'next_election', 'pay_rise', 'war_position', 'foreign_aid', 'immigration']
+    experimental_settings = {'debate': ['privacy', 'maths'],
+                            'negotiation_price': ['apples', 'car'],
+                            'negotiation_politics': ['payrise', 'defense'],
+                            'negotiation_binary': ['day_off', 'dog'],
+                            'interrogation': ['sibling', 'war_position', 'whispers']
                             }
-    experiments_path = "experiments/bin_inter/pre_meeting/"
+    experiments_path = "experiments/final_final_initial_run/"
     models = ["gpt-3.5-turbo"]
     
     results = parse_evaluations(experiments_path, experimental_settings, models)
-    import pdb; pdb.set_trace()
-    outfile = "bin_inter_results.xlsx"
+
+    outfile = "large_run_results.xlsx"
     write_results_to_csv(results, outfile)
-    import pdb; pdb.set_trace()
