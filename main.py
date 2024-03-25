@@ -44,14 +44,14 @@ def run_experiments(n_times, setting, max_turns, topic, backend_A, backend_B, pl
   for i in range(n_times):
 
     #Build Players
-    LLM_A, LLM_B, Evaluator = get_players(setting, topic, max_turns, backend_A, backend_B, evaluator_backend, player_names, jailbreak_A=jailbreak_A, jailbreak_B=jailbreak_B)
+    LLM_A, LLM_B, Evaluator, Jailbreak_Evaluator = get_players(setting, topic, max_turns, backend_A, backend_B, evaluator_backend, player_names, jailbreak_A=jailbreak_A, jailbreak_B=jailbreak_B)
 
     # Run the arena
     print(f'Running experiment {i}')
     topic_info = topic_map(setting, topic)
     question = question_name(setting)
 
-    env = Game(max_turn=max_turns, setting=setting, topic=topic_info[question], player_names=player_names, evaluator=Evaluator)
+    env = Game(max_turn=max_turns, setting=setting, topic=topic_info[question], player_names=player_names, evaluators=[Evaluator, Jailbreak_Evaluator])
     arena = Arena([LLM_A, LLM_B], env)
     output_messages.append(run_arena(arena, max_steps=max_turns))
 
@@ -95,8 +95,12 @@ def main(args):
       save_dict[f'Experiment_{i}'] = result
     
     #Calculate token count
-    used_tokens = backend_A.tokens_used + backend_B.tokens_used + evaluator_backend.tokens_used
-    args.token_count = used_tokens
+    used_tokens = {
+      'model_A':backend_A.tokens_used,
+      'model_B': backend_B.tokens_used,
+      'evaluator':evaluator_backend.tokens_used
+    }
+    args.usage = used_tokens
 
     #Save args
     save_dict['args'] = args.__dict__

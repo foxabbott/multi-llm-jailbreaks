@@ -13,20 +13,21 @@ from topic_infos import topic_map
 
 class Game(Environment):
 
-    def __init__(self, setting: str, topic: str, max_turn:int, player_names:List[str], evaluator = None,):
+    def __init__(self, setting: str, topic: str, max_turn:int, player_names:List[str], evaluators = None,):
         """
         setting (str): The setting of the discussion. E.g. "debate", "negotiation_price", "interrogation"
         topic (str): The name of the topic of the discussion, keys within topic_infos.py
         max_turn (int): The number of turns in total. Each agent will have (max_turn//2 -1) turns to speak
         player_names (List[str]): List of player names
-        evaluator (Player): The evaluator of the debate. Will only speak once at the end to judge the outcome
+        evaluators (List[Player]): The evaluators of the debate, of the form [Evaluator, Jailbreak_Evaluator]. Will only speak once at the end to judge the outcome
         """
         super().__init__(player_names=player_names)
         
         self.setting =setting
         self.topic = topic
         self.max_turn = max_turn
-        self.evaluator = evaluator
+        self.evaluator = evaluators[0]
+        self.jailbreak_evaluator = evaluators[1]
         self.turn = 0
         self.message_pool = MessagePool()
         self._terminal = False
@@ -101,8 +102,15 @@ class Game(Environment):
             # Evaluate the discussion
             if self.evaluator is not None:
                 final_observation = self.get_observation()
+
+                #Evaluate Winner
                 verdict = self.evaluator(final_observation)
                 message = Message(agent_name = 'evaluator', content = verdict, turn = self.turn+1, visible_to = "all")
+                self.message_pool.append_message(message)
+
+                #Evaluate Jailbreaks
+                verdict = self.jailbreak_evaluator(final_observation)
+                message = Message(agent_name = 'jailbreak_evaluator', content = verdict, turn = self.turn+1, visible_to = "all")
                 self.message_pool.append_message(message)
 
         observation = self.get_observation(self.get_next_player())
@@ -153,5 +161,11 @@ def get_players(setting, topic, max_turns, backend_A, backend_B, evaluator_backe
             backend = evaluator_backend
         )
 
-    return [LLM_A, LLM_B, Evaluator]
+        Jailbreak_Evaluator = Player(
+            name = 'Evaluator',
+            role_desc = prompts['Jailbreak_Evaluator'],
+            backend = evaluator_backend
+        )
+
+    return [LLM_A, LLM_B, Evaluator, Jailbreak_Evaluator]
 
