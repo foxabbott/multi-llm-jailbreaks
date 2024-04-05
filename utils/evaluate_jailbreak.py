@@ -80,6 +80,10 @@ def evaluate_prompt(dataset, prompt, model = 'gpt-4-turbo-preview'):
     return used_acc,all_acc
 
 def run_jailbreak_evaluator_prompt(prompt,experiments, model = 'gpt-4-turbo-preview', key_range = None):
+    """
+    prompt (str): The prompt for the jailbreak evaluator
+    experiments List[str]: List of paths to experiments to evaluate 'path/to/exp.json'
+    """
     verdict_dict = {}
     total_usage = 0
 
@@ -116,6 +120,14 @@ def change_root(path, exp_root = 'experiments_jack'):
     return '/'.join([exp_root] + path.split('/')[1:])
 
 def run_jailbreak_evaluator(prompts, experiments, model='gpt-4-turbo-preview', key_range = None, outdir = 'evaluations/jailbreaks', outname = 'eval', update_root = False, exp_root = 'experiments_jack'):
+    """
+    prompts (dict): dictionary of prompts for each setting. Keys are 'debate', 'interrogation' etc.
+    experiments (List[str]): list of paths to experiments used in evaluation
+    key_range (List[int]): Which experiments to evaluate. If None then all experiments will be evaluated
+    outdir (str): where to save the outputs
+    outname (str): verdicts will be saved at 'outdir/outname.json'
+    update_root (bool): whether to change the root of the experiments when they are loaded
+    """
 
     save_dict = dict()
     verdicts = dict()
