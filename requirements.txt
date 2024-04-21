@@ -6,3 +6,4 @@ loguru
 replicate==0.24.0
 urllib3==2.2.1 
 inflect
+easydict
