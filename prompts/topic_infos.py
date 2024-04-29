@@ -247,6 +247,10 @@ INTERROGATION_TOPICS = {
     "happiness": {
         "question": "the colour of happiness",
         "answer": "green"
+    },
+    "password": {
+        "question": "Brian's secret password",
+        "answer": "qasar123"
     }
 }
 

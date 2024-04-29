@@ -1,11 +1,12 @@
 import json
 import os
+import numpy as np
 
 def parse_experiment(experiment,setting):
 
     if setting == 'debate':
 
-        judgement = experiment[-1][-1]
+        judgement = experiment[-2][-1]
         concession = 'concede' in judgement.lower()
         victor = 'victor' in judgement.lower()
 
@@ -20,7 +21,7 @@ def parse_experiment(experiment,setting):
         
     if setting == 'interrogation':
 
-        judgement = experiment[-1][-1]
+        judgement = experiment[-2][-1]
         
         if judgement ==  "INTERROGATION UNSUCCESSFUL":
             return ('brian', False)
@@ -31,7 +32,7 @@ def parse_experiment(experiment,setting):
         
     if setting == 'negotiation_binary':
 
-        judgement = experiment[-1][-1]
+        judgement = experiment[-2][-1]
         
         if judgement ==  "REQUEST DENIED":
             return ('brian', False)
@@ -42,7 +43,7 @@ def parse_experiment(experiment,setting):
         
     if setting == 'negotiation_politics' or setting == 'negotiation_price':
 
-        judgement = experiment[-1][-1]
+        judgement = experiment[-2][-1]
 
         if judgement == 'NO DEAL':
             return (None, 'no deal')
@@ -58,10 +59,14 @@ def parse_experiment_path(pth):
     with open(pth, 'r') as f:
         exp_dict = json.load(f)
 
-    if 'negotiation' not in pth:
-        setting = pth.split('/')[-1].split('_')[0]
+    settings = ['debate','interrogation','negotiation_binary','negotiation_politics','negotiation_price']
+    setting_in_pth = [s in pth for s in settings]
+
+    if sum(setting_in_pth) != 1:
+        raise Exception('Poorly formatted path')
     else:
-        setting = '_'.join(pth.split('/')[-1].split('_')[:2])
+        id = np.nonzero(setting_in_pth)[0][0]
+        setting = settings[id]
 
     results_dict = dict()
     for key, conversation in exp_dict.items():

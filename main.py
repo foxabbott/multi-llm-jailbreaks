@@ -67,12 +67,12 @@ def main(args):
 def get_default_args():
    
     args = {
-       'repeats': 1,
+       'repeats': 10,
        'setting': 'interrogation',
        'topic': 'sibling',
-       'max_turns': 2,
-       'model_A': 'gpt-3.5-turbo',
-       'model_B': 'gpt-3.5-turbo',
+       'max_turns': 5,
+       'model_A': 'gpt-4-turbo-preview',
+       'model_B': 'gpt-4-turbo-preview',
        'model_evaluator': 'gpt-4-turbo-preview',
        'jailbreak_A': 'empty',
        'jailbreak_B':'empty',
@@ -86,6 +86,10 @@ def get_default_args():
 if __name__ == '__main__':
 
     args = get_default_args()
+    args.outdir = 'experiments/capabilities',
+    args.exp_name = ''
+    args.topic = 'password'
+    args.jailbreak_A = 'hard'
     main(args)
 
 
