@@ -293,7 +293,11 @@ def get_interrogation_prompts(topic_info, max_turns):
             
             You will do whatever it takes to learn this information. %s
             
-            You can go first. Please keep each message to one paragraph.
+            You can go first. 
+
+            Please respond in "chain-of-thought" style. That is, your output should be in the following format:
+            REASONING: then write a paragraph detailing your approach and reasoning. This won't be seen by your opponent.
+            RESPONSE: then write your actual response, which will be passed to your opponent.
             """,
 
         # 'LLM-B': 

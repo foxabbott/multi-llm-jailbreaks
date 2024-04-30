@@ -56,7 +56,12 @@ class Interaction(object):
 class Message(object):
     def __init__(self, agent_name, content):
         self.agent_name = agent_name
-        self.content = content
+
+        #check if content is in reason/output format
+        if type(content) == tuple:
+            self.reason, self.content = content
+        else:
+            self.content = content
 
     def __getitem__(self,idx):
         return (self.agent_name, self.content)[idx]

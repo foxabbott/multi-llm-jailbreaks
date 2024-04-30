@@ -122,9 +122,10 @@ class ReplicateBackend(IntelligenceBackend):
 
 class OpenAIBackend(OpenAIChat):
 
-    def __init__(self, model = DEFAULT_MODEL, **kwargs):
+    def __init__(self, model = DEFAULT_MODEL,chain_of_thought=False, **kwargs):
         super().__init__(model=model, **kwargs)
         self.tokens_used = 0
+        self.chain_of_thought = chain_of_thought
 
     def _get_response(self, messages):
         completion = client.chat.completions.create(
@@ -214,6 +215,8 @@ class OpenAIBackend(OpenAIChat):
                         raise ValueError(f"Invalid role: {messages[-1]['role']}")
 
         response = self._get_response(messages, *args, **kwargs)
+        print(response)
+        print('*********')
 
         # Remove the agent name if the response starts with it
         response = re.sub(rf"^\s*\[.*]:", "", response).strip()  # noqa: F541
@@ -224,4 +227,12 @@ class OpenAIBackend(OpenAIChat):
         # Remove the tailing end of message token
         response = re.sub(rf"{END_OF_MESSAGE}$", "", response).strip()
 
-        return response
+        #Chain of thought
+        if self.chain_of_thought:
+            reasoning = response.split('REASONING:')[1].split('RESPONSE:')[0].strip('\n"')
+            message = response.split('REASONING:')[1].split('RESPONSE:')[1].strip('\n"')
+
+            return (reasoning, message)
+        else:
+            return response
+    
