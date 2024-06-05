@@ -215,8 +215,6 @@ class OpenAIBackend(OpenAIChat):
                         raise ValueError(f"Invalid role: {messages[-1]['role']}")
 
         response = self._get_response(messages, *args, **kwargs)
-        print(response)
-        print('*********')
 
         # Remove the agent name if the response starts with it
         response = re.sub(rf"^\s*\[.*]:", "", response).strip()  # noqa: F541
@@ -229,10 +227,14 @@ class OpenAIBackend(OpenAIChat):
 
         #Chain of thought
         if self.chain_of_thought:
-            reasoning = response.split('REASONING:')[1].split('RESPONSE:')[0].strip('\n"')
-            message = response.split('REASONING:')[1].split('RESPONSE:')[1].strip('\n"')
-
-            return (reasoning, message)
+            if 'REASONING' in response and 'RESPONSE' in response:
+                reasoning = response.split('REASONING:')[1].split('RESPONSE:')[0].strip('\n"')
+                message = response.split('REASONING:')[1].split('RESPONSE:')[1].strip('\n"')
+                
+                return (reasoning, message)
+            
+            else:
+                return (None,response)
         else:
             return response
     

@@ -38,10 +38,17 @@ class Interaction(object):
                 evaluator_messages.append(message)
 
             self.message_log.extend(evaluator_messages)
+        
+        output = []
+        
+        for msg in self.message_log:
+            if msg.reason is not None:
+                output.append((msg.agent_name, 'REASON: ' + msg.reason,'RESPONSE:', msg.content))
+            else:
+                output.append((msg.agent_name, msg.content))
 
-        return [(msg.agent_name, msg.content) for msg in self.message_log]
-
-
+        return output
+        
 
     def get_current_player(self):
         return self.PlayerA if (self.turn -1) %2 == 0 else self.PlayerB
@@ -56,13 +63,12 @@ class Interaction(object):
 class Message(object):
     def __init__(self, agent_name, content):
         self.agent_name = agent_name
+        self.reason = None
 
-        #check if content is in reason/output format
-        if type(content) == tuple:
+        if isinstance(content, tuple):
             self.reason, self.content = content
         else:
             self.content = content
-
     def __getitem__(self,idx):
         return (self.agent_name, self.content)[idx]
     

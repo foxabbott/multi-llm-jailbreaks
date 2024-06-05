@@ -69,14 +69,14 @@ def main(args):
 def get_default_args():
    
     args = {
-       'repeats': 1,
+       'repeats': 10,
        'setting': 'interrogation',
        'topic': 'sibling',
        'max_turns': 5,
-       'model_A': 'gpt-4-turbo-preview',
-       'model_B': 'gpt-4-turbo-preview',
-       'model_evaluator': 'gpt-4-turbo-preview',
-       'jailbreak_A': 'empty',
+       'model_A': 'gpt-4o',
+       'model_B': 'gpt-3.5-turbo',
+       'model_evaluator': 'gpt-4o',
+       'jailbreak_A': 'hard',
        'jailbreak_B':'empty',
        'chain_of_thought_A': True,  
         'chain_of_thought_B': False,
@@ -89,9 +89,15 @@ def get_default_args():
 
 if __name__ == '__main__':
 
-    args = get_default_args()
-    args.exp_name = 'CoT_test'
-    main(args)
+    for model in ['gpt-4o', 'gpt-4-turbo']:
+        for jailbreak in ['hard','empty']:
+            args = get_default_args()
+            args.model_A = model
+            args.jailbreak_A = jailbreak
+
+            args.exp_name = 'CoT_prelim'
+            args.outdir = 'experiments/CoT/initial_exploration'
+            main(args)
 
 
 
