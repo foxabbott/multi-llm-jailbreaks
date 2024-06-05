@@ -52,9 +52,9 @@ def get_players(setting, topic, max_turns, backend_A, backend_B, evaluator_backe
 
     return [LLM_A, LLM_B, Evaluator, Jailbreak_Evaluator]
 
-def get_backend(model_name):
+def get_backend(model_name, chain_of_thought= False):
   if 'gpt' in model_name:
-    return OpenAIBackend(model = model_name)
+    return OpenAIBackend(model = model_name, chain_of_thought=chain_of_thought)
   else:
     return ReplicateBackend(model = model_name)
   

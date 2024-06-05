@@ -122,9 +122,10 @@ class ReplicateBackend(IntelligenceBackend):
 
 class OpenAIBackend(OpenAIChat):
 
-    def __init__(self, model = DEFAULT_MODEL, **kwargs):
+    def __init__(self, model = DEFAULT_MODEL,chain_of_thought=False, **kwargs):
         super().__init__(model=model, **kwargs)
         self.tokens_used = 0
+        self.chain_of_thought = chain_of_thought
 
     def _get_response(self, messages):
         completion = client.chat.completions.create(
@@ -224,4 +225,16 @@ class OpenAIBackend(OpenAIChat):
         # Remove the tailing end of message token
         response = re.sub(rf"{END_OF_MESSAGE}$", "", response).strip()
 
-        return response
+        #Chain of thought
+        if self.chain_of_thought:
+            if 'REASONING' in response and 'RESPONSE' in response:
+                reasoning = response.split('REASONING:')[1].split('RESPONSE:')[0].strip('\n"')
+                message = response.split('REASONING:')[1].split('RESPONSE:')[1].strip('\n"')
+                
+                return (reasoning, message)
+            
+            else:
+                return (None,response)
+        else:
+            return response
+    
