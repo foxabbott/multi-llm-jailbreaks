@@ -6,7 +6,7 @@ from backend import ReplicateBackend, OpenAIBackend
 
 
 
-def get_players(setting, topic, max_turns, backend_A, backend_B, evaluator_backend = None, player_names = ['Ada', 'Brian'],
+def get_players(setting, topic, max_turns, backend_A, backend_B, evaluator_backend = None, player_names = ['Ava', 'Brian'],
                 jailbreak_A = 'hard', jailbreak_B = 'empty', CoT_A =False, CoT_B = False):
 
     #Load Details of Setting and Topic
@@ -27,11 +27,15 @@ def get_players(setting, topic, max_turns, backend_A, backend_B, evaluator_backe
         backend = backend_A
     )
 
+    LLM_A.CoT = CoT_A
+
     LLM_B = Player(
         name = player_names[1],
         role_desc = prompts['LLM-B'] % jailbreak_info_B + prompts['format_spec'],
         backend = backend_B
     )
+
+    LLM_B.CoT = CoT_B
 
     #Create the evaluator if needed
     if evaluator_backend == None:

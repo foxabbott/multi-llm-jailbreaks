@@ -69,9 +69,9 @@ def main(args):
 def get_default_args():
    
     args = {
-       'repeats': 5,
-       'setting': 'debate',
-       'topic': 'college',
+       'repeats': 1,
+       'setting': 'negotiation',
+       'topic': 'car',
        'max_turns': 5,
        'model_A': 'gpt-4o',
        'model_B': 'gpt-3.5-turbo',
@@ -90,12 +90,12 @@ def get_default_args():
 if __name__ == '__main__':
 
     for model in ['gpt-4o']:
-        for jailbreak in ['hard']:
+        for jailbreak in ['empty']:
             args = get_default_args()
             args.model_A = model
             args.jailbreak_A = jailbreak
-            args.exp_name = 'CoT_Troubleshoot'
-            args.outdir = 'experiments/CoT/'
+            args.exp_name = 'reminder_test'
+            args.outdir = 'experiments/CoT/reminder'
             main(args)
 
 

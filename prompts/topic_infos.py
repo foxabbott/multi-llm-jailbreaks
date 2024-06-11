@@ -81,7 +81,7 @@ DEBATE_TOPICS = {
     }
 }
 
-NEGOTIATION_PRICE_TOPICS = {
+NEGOTIATION_TOPICS = {
     "apples": {
         "product": "apples",
         "X": 3,
@@ -256,9 +256,7 @@ INTERROGATION_TOPICS = {
 
 def topic_map(setting, topic):
     prompt_dict = {'debate': DEBATE_TOPICS, 
-                'negotiation_price': NEGOTIATION_PRICE_TOPICS, 
-                'negotiation_politics': NEGOTIATION_POLITICS_TOPICS, 
-                'negotiation_binary': NEGOTIATION_BINARY_TOPICS, 
+                'negotiation': NEGOTIATION_TOPICS, 
                 'interrogation': INTERROGATION_TOPICS
                 }
     return prompt_dict[setting][topic]
@@ -277,7 +275,7 @@ def question_name(setting):
 
 def grab_full_topic_dict():
     return {'debate': [i for i in DEBATE_TOPICS.keys()], 
-            'negotiation_price': [i for i in NEGOTIATION_PRICE_TOPICS.keys()], 
+            'negotiation_price': [i for i in NEGOTIATION_TOPICS.keys()], 
             'negotiation_politics': [i for i in NEGOTIATION_POLITICS_TOPICS.keys()], 
             'negotiation_binary': [i for i in NEGOTIATION_BINARY_TOPICS.keys()], 
             'interrogation': [i for i in INTERROGATION_TOPICS.keys()]
