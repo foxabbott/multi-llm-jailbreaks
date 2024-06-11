@@ -69,9 +69,9 @@ def main(args):
 def get_default_args():
    
     args = {
-       'repeats': 1,
-       'setting': 'negotiation_price',
-       'topic': 'car',
+       'repeats': 5,
+       'setting': 'debate',
+       'topic': 'college',
        'max_turns': 5,
        'model_A': 'gpt-4o',
        'model_B': 'gpt-3.5-turbo',
