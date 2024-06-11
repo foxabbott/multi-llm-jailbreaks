@@ -8,16 +8,16 @@ from easydict import EasyDict
 import json
 
 
-def run_experiments(repeats,setting,topic,max_turns,model_A,model_B,model_evaluator,player_names,jailbreak_A,jailbreak_B,chain_of_thought_A, **kwargs):
+def run_experiments(repeats,setting,topic,max_turns,model_A,model_B,model_evaluator,player_names,jailbreak_A,jailbreak_B,CoT_A,CoT_B, **kwargs):
 
 
 
     #Load Backends for Players
-    backendA = get_backend(model_A, chain_of_thought=chain_of_thought_A)
+    backendA = get_backend(model_A, chain_of_thought=CoT_A)
     backendB, backendEval = get_backends(model_B,model_evaluator)
 
     #Build Players and Evaluators
-    LLM_A, LLM_B, Win_Evaluator, Jailbreak_Evaluator = get_players(setting, topic, max_turns, backendA, backendB, backendEval, player_names, jailbreak_A=jailbreak_A, jailbreak_B=jailbreak_B)
+    LLM_A, LLM_B, Win_Evaluator, Jailbreak_Evaluator = get_players(setting, topic, max_turns, backendA, backendB, backendEval, player_names, jailbreak_A=jailbreak_A, jailbreak_B=jailbreak_B, CoT_A = CoT_A, CoT_B = CoT_B)
     Evaluators = [Win_Evaluator, Jailbreak_Evaluator
                   ]
     #Build interaction
@@ -69,17 +69,17 @@ def main(args):
 def get_default_args():
    
     args = {
-       'repeats': 10,
-       'setting': 'interrogation',
-       'topic': 'sibling',
+       'repeats': 1,
+       'setting': 'negotiation_price',
+       'topic': 'car',
        'max_turns': 5,
        'model_A': 'gpt-4o',
        'model_B': 'gpt-3.5-turbo',
        'model_evaluator': 'gpt-4o',
        'jailbreak_A': 'hard',
        'jailbreak_B':'empty',
-       'chain_of_thought_A': True,  
-        'chain_of_thought_B': False,
+       'CoT_A': True,  
+        'CoT_B': False,
        'player_names':['Ava','Brian'],
        'outdir':'experiments',
        'exp_name':'test_run'
@@ -89,14 +89,13 @@ def get_default_args():
 
 if __name__ == '__main__':
 
-    for model in ['gpt-4o', 'gpt-4-turbo']:
-        for jailbreak in ['hard','empty']:
+    for model in ['gpt-4o']:
+        for jailbreak in ['hard']:
             args = get_default_args()
             args.model_A = model
             args.jailbreak_A = jailbreak
-
-            args.exp_name = 'CoT_prelim'
-            args.outdir = 'experiments/CoT/initial_exploration'
+            args.exp_name = 'CoT_Troubleshoot'
+            args.outdir = 'experiments/CoT/'
             main(args)
 
 

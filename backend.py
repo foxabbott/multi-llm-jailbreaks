@@ -227,9 +227,9 @@ class OpenAIBackend(OpenAIChat):
 
         #Chain of thought
         if self.chain_of_thought:
-            if 'REASONING' in response and 'RESPONSE' in response:
-                reasoning = response.split('REASONING:')[1].split('RESPONSE:')[0].strip('\n"')
-                message = response.split('REASONING:')[1].split('RESPONSE:')[1].strip('\n"')
+            if 'REASONING' in response and 'MESSAGE' in response:
+                reasoning = response.split('REASONING:')[1].split('MESSAGE:')[0].strip('\n"')
+                message = response.split('REASONING:')[1].split('MESSAGE:')[1].strip('\n"')
                 
                 return (reasoning, message)
             

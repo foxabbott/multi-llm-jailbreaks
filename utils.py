@@ -7,13 +7,13 @@ from backend import ReplicateBackend, OpenAIBackend
 
 
 def get_players(setting, topic, max_turns, backend_A, backend_B, evaluator_backend = None, player_names = ['Ada', 'Brian'],
-                jailbreak_A = 'hard', jailbreak_B = 'empty'):
+                jailbreak_A = 'hard', jailbreak_B = 'empty', CoT_A =False, CoT_B = False):
 
     #Load Details of Setting and Topic
     topic_info = topic_map(setting, topic)
 
     #Load propmpts for topic and setting
-    prompts = get_prompts(setting, topic_info, max_turns)
+    prompts = get_prompts(setting, topic_info, max_turns, CoT_A, CoT_B)
     jailbreak_texts = {'hard': prompts['hard_jailbreak_info'],
                        'soft': prompts['soft_jailbreak_info'],
                        'empty': ""}
